@@ -348,27 +348,27 @@ E então resolva esses problemas:
 1. Retorne o tamanho da String "pneumoultramicroscopicossilicovulcanoconiótico".
 
 ```elixir
-
+String.length("pneumoultramicroscopicossilicovulcanoconiótico")
 ```
 
-2. Retorne uma Lista que possui os mesmos items da lista [:a, :b, :c] porém com os itens na ordem contrária, ou seja [:c, :b, :a].
+1. Retorne uma Lista que possui os mesmos items da lista [:a, :b, :c] porém com os itens na ordem contrária, ou seja [:c, :b, :a].
 
 ```elixir
-
+Enum.reverse([:a, :b, :c])
 ```
 
-3. Retorne um novo mapa que é a união desses dois mapas:
+1. Retorne um novo mapa que é a união desses dois mapas:
 
 ```elixir
-primeiro_mapa = %{ :um  =>  1, :dois => 2 }
-segundo_mapa  = %{ :tres  =>  3, :quatro => 4 }
+primeiro_mapa = %{:um => 1, :dois => 2}
+segundo_mapa = %{:tres => 3, :quatro => 4}
 ```
 
 ```elixir
-
+Map.merge(primeiro_mapa, segundo_mapa)
 ```
 
-4. Retorne uma lista de palavras da sentença:
+1. Retorne uma lista de palavras da sentença:
 
 ```elixir
 # execute essa célula de código
@@ -378,10 +378,10 @@ Como de hábito, Policarpo Quaresma, mais conhecido por Major Quaresma, bateu em
 ```
 
 ```elixir
-
+String.split(sentenca, " ")
 ```
 
-5. Crie uma nova lista onde cada elemento corresponde a um elemento  da lista abaixo multiplicado por 2. Depois disso, some todos os elementos da nova lista.
+1. Crie uma nova lista onde cada elemento corresponde a um elemento  da lista abaixo multiplicado por 2. Depois disso, some todos os elementos da nova lista.
 
 ```elixir
 # execute essa célula de código
@@ -389,7 +389,7 @@ lista_de_numeros = [4, 8, 12, 16, 20, 24, 28, 32, 36]
 ```
 
 ```elixir
-
+Enum.map(lista_de_numeros, fn num -> num * 2 end)
 ```
 
 ### Exercício 2
@@ -423,25 +423,97 @@ Abaixo, temos um "esqueleto" da implementação. Os professores esperam que essa
 ```elixir
 defmodule AlgebraLinear do
   def soma_matrizes(matriz_a, matriz_b) do
-    # A fazer
+    op = fn a, b -> a + b end
+    obter_linha(matriz_a, matriz_b, op, [])
   end
 
   def subtrai_matrizes(matriz_a, matriz_b) do
-    # A fazer
+    op = fn a, b -> a - b end
+    obter_linha(matriz_a, matriz_b, op, [])
   end
 
   def multiplica_matrizes(matriz_a, matriz_b) do
-    # A fazer
+    op = fn a, b -> a * b end
+    obter_linha(matriz_a, matriz_b, op, [])
   end
 
   def escalar(matriz, escalar) do
-    # A fazer
+    multiplica_escalar(matriz, escalar, [])
   end
 
-  def determinante(matriz) do
-    # A fazer
+  defp multiplica_escalar([], _, acc), do: Enum.reverse(acc)
+
+  defp multiplica_escalar([h | t], escalar, acc) do
+    multiply = Enum.map(h, fn item -> item * escalar end)
+    multiplica_escalar(t, escalar, [multiply | acc])
+  end
+
+  def determinante([[_ | _] = li_a, [_ | _] = li_b, [_ | _] = li_c | []]) do
+    [a11, a12, a13] = li_a
+    [a21, a22, a23] = li_b
+    [a31, a32, a33] = li_c
+    right = a11 * a22 * a33 + a12 * a23 * a31 + a13 * a21 * a32
+    left = a13 * a22 * a31 + a23 * a32 * a11 + a33 * a12 * a21
+    right - left
+  end
+
+  def determinante([[_ | _] = li_a, [_ | _] = li_b | []]) do
+    [a11, a12] = li_a
+    [a21, a22] = li_b
+    a11 * a22 - a12 * a21
+  end
+
+  def determinante([[item | _] | []]), do: item
+
+  defp obter_linha([], [], _op, acc), do: Enum.reverse(acc)
+
+  defp obter_linha([li_a | t_a], [li_b | t_b], op, acc) do
+    res_op = aplicar_operacao(li_a, li_b, op, [])
+    obter_linha(t_a, t_b, op, [res_op | acc])
+  end
+
+  defp aplicar_operacao([], [], _op, acc), do: Enum.reverse(acc)
+
+  defp aplicar_operacao([h_a | t_a], [h_b | t_b], op, acc) do
+    aplicar_operacao(t_a, t_b, op, [op.(h_a, h_b) | acc])
   end
 end
+```
+
+```elixir
+AlgebraLinear.soma_matrizes([[0, 0, 1], [0, 1, 0], [1, 0, 0]], [[1, 1, 1], [1, 1, 1], [1, 1, 1]])
+```
+
+```elixir
+AlgebraLinear.subtrai_matrizes([[0, 0, 1], [0, 1, 0], [1, 0, 0]], [
+  [1, 1, 1],
+  [1, 1, 1],
+  [1, 1, 1]
+])
+```
+
+```elixir
+AlgebraLinear.multiplica_matrizes([[0, 0, 1], [0, 1, 0], [1, 0, 0]], [
+  [1, 1, 1],
+  [1, 1, 1],
+  [1, 1, 1]
+])
+```
+
+```elixir
+AlgebraLinear.escalar([[10, 6], [4, 3]], 2)
+```
+
+```elixir
+AlgebraLinear.determinante([[1, 9, 5], [3, 7, 8], [10, 4, 2]])
+```
+
+```elixir
+AlgebraLinear.determinante([[1, 5], [2, 3]])
+```
+
+```elixir
+AlgebraLinear.determinante([[2]])
 ```
 
 ### Exercício 3
@@ -493,7 +565,22 @@ Você deve usar funções anônimas e as funções map, filter e reduce para imp
 ```elixir
 defmodule Recomendacao do
   def recomenda(musicas, preferencia) do
-    # A fazer
+    musicas
+    |> Enum.filter(fn musica -> filtro(musica, preferencia) end)
+    |> ordenar()
+  end
+
+  defp ordenar(lista) do
+    lista
+    |> Enum.sort_by(& &1.titulo)
+    |> Enum.sort_by(& &1.avaliacao, :desc)
+  end
+
+  defp filtro(musica, preferencia) do
+    musica.duracao >= preferencia.duracao_min &&
+      musica.duracao <= preferencia.duracao_max &&
+      musica.genero == preferencia.genero &&
+      musica.avaliacao >= preferencia.avaliacao_min
   end
 end
 ```
