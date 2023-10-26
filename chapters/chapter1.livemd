@@ -97,7 +97,7 @@ Avalie os exemplos abaixo para ver o que acontece!
 ```
 
 ```elixir
-.14
+0.14
 ```
 
 ```elixir
@@ -1107,11 +1107,16 @@ Resolva a equação quadrática **x² - 2x + 1 = 0** calculando seu delta e sua(
 ```
 
 ```elixir
-delta =
+a = 1
+b = 2
+c = 1
+delta = :math.pow(b, 2) - 4 * a * c
 ```
 
 ```elixir
-x =
+x1 = (-b + :math.sqrt(delta)) / (2 * a)
+x2 = (-b - :math.sqrt(delta)) / (2 * a)
+"x1 = #{x1} // x2 = #{x2}"
 ```
 
 ### Exercicio 4
@@ -1190,31 +1195,36 @@ Com esses dados use **casamento de padrões** (pattern matching) para:
 1. Extrair o primeiro comentário.
 
 ```elixir
-
+[%{} = primeiro_comentario | _] = resposta_completa
+primeiro_comentario
 ```
 
 1. Salvar o nome do segundo comentário em uma variável `titulo`.
 
 ```elixir
-titulo =
+[_, %{"name" => titulo} | _] = resposta_completa
+titulo
 ```
 
 1. Extrair o comentário de **id** `11` do produto de **productId** `3` e criar um novo mapa que contêm todos os valores desse item porém mudando o `email` para `contato@foobar.br`.
 
 ```elixir
-
+[_, _, _, _, %{"id" => 11, "productId" => 3} = item | _] = resposta_completa
+%{item | "email" => "contato@foobar.br"}
 ```
 
 1. Extrair o **body** do terceiro comentário.
 
 ```elixir
-
+[_, _, %{"body" => body} | _] = resposta_completa
+body
 ```
 
 1. Criar uma nova lista removendo o segundo item.
 
 ```elixir
-
+[_, %{} = segundo_item | _] = resposta_completa
+resposta_completa -- [segundo_item]
 ```
 
 ### Exercicio 5
@@ -1240,55 +1250,120 @@ E com base nesses dados foi pedido que:
 1. Crie um modelo de estrutura (struct) que represente o modelo de um planeta baseado nesses dados fornecidos. Ele deve ter valores default e todos os campos são requeridos.
 
 ```elixir
+defmodule Planeta do
+  @enforce_keys ~w(nome superficie volume massa temperatura distancia_sol)a
 
+  defstruct nome: "",
+            superficie: 0.0,
+            volume: 0.0,
+            massa: 0.0,
+            temperatura: 0.0,
+            distancia_sol: 0
+end
 ```
 
 1. Crie uma variavel `mercurio` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-mercurio =
+mercurio = %Planeta{
+  nome: "Mercúrio",
+  superficie: 7.48e7,
+  volume: 6.083e10,
+  massa: 3.3011e23,
+  temperatura: 166.85,
+  distancia_sol: 57_910_000
+}
 ```
 
 1. Crie uma variavel `venus` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-venus =
+venus = %Planeta{
+  nome: "Vênus",
+  superficie: 4.60e8,
+  volume: 92.843e10,
+  massa: 4.8685e24,
+  temperatura: 461,
+  distancia_sol: 108_200_000
+}
 ```
 
 1. Crie uma variavel `terra` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-terra =
+terra = %Planeta{
+  nome: "Terra",
+  superficie: 5.10e8,
+  volume: 1.08321e12,
+  massa: 5.9736e24,
+  temperatura: 14,
+  distancia_sol: 149_600_000
+}
 ```
 
 1. Crie uma variavel `marte` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-marte =
+marte = %Planeta{
+  nome: "Marte",
+  superficie: 1.44e8,
+  volume: 1.6318e11,
+  massa: 6.4174e23,
+  temperatura: -63,
+  distancia_sol: 227_940_000
+}
 ```
 
 1. Crie uma variavel `jupiter` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-jupiter =
+jupiter = %Planeta{
+  nome: "Júpiter",
+  superficie: 6.21796e10,
+  volume: 1.43128e15,
+  massa: 1.8986e27,
+  temperatura: -108,
+  distancia_sol: 778_330_000
+}
 ```
 
 1. Crie uma variavel `saturno` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-saturno =
+saturno = %Planeta{
+  nome: "Saturno",
+  superficie: 4.27e10,
+  volume: 8.2713e14,
+  massa: 5.6846e26,
+  temperatura: -139,
+  distancia_sol: 1_429_400_000
+}
 ```
 
 1. Crie uma variavel `urano` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-urano =
+urano = %Planeta{
+  nome: "Urano",
+  superficie: 8.1156e9,
+  volume: 6.833e13,
+  massa: 8.6810e25,
+  temperatura: -220,
+  distancia_sol: 2_870_990_000
+}
 ```
 
 1. Crie uma variavel `netuno` com as informações deste planeta em uma instância da estrutura que você criou.
 
 ```elixir
-netuno =
+netuno = %Planeta{
+  nome: "Netuno",
+  superficie: 7.6183e9,
+  volume: 6.254e13,
+  massa: 1.0243e26,
+  temperatura: -223,
+  distancia_sol: 4_504_000_000
+}
 ```
 
 1. Crie um mapa para representar o sistema solar, ela deve ter as chaves:
@@ -1300,7 +1375,11 @@ netuno =
 Salve esse mapa criado em uma variável `sistema_solar`.
 
 ```elixir
-sistema_solar =
+sistema_solar = %{
+  estrela: "Sol",
+  nome: "Sistema Solar",
+  planetas: [mercurio, venus, terra, marte, jupiter, saturno, urano, netuno]
+}
 ```
 
 ---
