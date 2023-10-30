@@ -657,52 +657,86 @@ Neste exercício, a documentação oficial do módulo [Enum](https://hexdocs.pm/
 
 ```elixir
 defmodule CalculoEsculturas do
-  def raio_minimo() do
-    # A fazer
+  def raio_minimo(circulos) do
+    Enum.min(circulos)
   end
 
-  def raio_maximo() do
-    # A fazer
+  def raio_maximo(circulos) do
+    Enum.max(circulos)
   end
 
-  def diametro_minimo() do
-    # A fazer
+  def diametro_minimo(circulos) do
+    2 * raio_minimo(circulos)
   end
 
-  def diametro_maximo() do
-    # A fazer
+  def diametro_maximo(circulos) do
+    2 * raio_maximo(circulos)
   end
 
-  def area_minima() do
-    # A fazer
+  def area_minima(circulos) do
+    :math.pi() * :math.pow(raio_minimo(circulos), 2)
   end
 
-  def area_maxima() do
-    # A fazer
+  def area_maxima(circulos) do
+    :math.pi() * :math.pow(raio_maximo(circulos), 2)
   end
 
-  def media_raios() do
-    # A fazer
+  def media_raios(circulos) do
+    Enum.sum(circulos) / numero_de_circulos(circulos)
   end
 
-  def numero_de_circulos() do
-    # A fazer
+  def numero_de_circulos(circulos) do
+    Enum.count(circulos)
   end
 
-  def ordena_raios() do
-    # A fazer
+  def ordena_raios(circulos) do
+    Enum.sort(circulos)
   end
 
-  def ordena_raios_descendente() do
-    # A fazer
+  def ordena_raios_descendente(circulos) do
+    Enum.sort(circulos, :desc)
   end
 
-  def variacao_raios() do
-    # A fazer
+  def variacao_raios(circulos) do
+    circulos
+    |> Enum.map(&:math.pow(&1 - media_raios(circulos), 2))
+    |> Enum.sum()
+    |> then(&:math.sqrt(&1 / numero_de_circulos(circulos)))
   end
 
-  def mediana_raios() do
-    # A fazer
+  def mediana_raios(circulos) do
+    obter_mediana(ordena_raios(circulos))
+  end
+
+  defp obter_mediana(circulos) when rem(length(circulos), 2) == 0 do
+    circulos
+    |> Enum.slice(div(numero_de_circulos(circulos), 2) - 1, 2)
+    |> Enum.sum()
+    |> then(&(&1 / 2))
+  end
+
+  defp obter_mediana(circulos) do
+    Enum.at(circulos, div(numero_de_circulos(circulos), 2))
   end
 end
+```
+
+```elixir
+CalculoEsculturas.raio_minimo(circulos)
+```
+
+```elixir
+CalculoEsculturas.raio_maximo(circulos)
+```
+
+```elixir
+CalculoEsculturas.variacao_raios([460, 800, 300, 400])
+```
+
+```elixir
+CalculoEsculturas.mediana_raios([4, 7, 12, 23, 38])
+```
+
+```elixir
+CalculoEsculturas.mediana_raios([1.83, 1.87, 1.97, 1.99, 2.01, 2.05])
 ```
