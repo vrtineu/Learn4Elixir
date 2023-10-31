@@ -193,7 +193,7 @@ A última cláusula com true é opcional, mas é uma boa prática incluí-la par
 Aqui está um exemplo de uso do cond no Livebook:
 
 ```elixir
-x = 5
+x = :a
 
 cond do
   is_number(x) and x == 0 ->
@@ -338,7 +338,7 @@ Exemplo:
 
 ```elixir
 mapa = %{"a" => 1, "b" => 2, "c" => 3}
-triplica_valores = for {chave, valor} <- mapa, do: {chave, valor * 3}
+triplica_valores = for {chave, valor} <- mapa, into: %{}, do: {chave, valor * 3}
 ```
 
 ## Compreensões Aninhadas
@@ -382,9 +382,28 @@ Para completar esta tarefa, você precisará usar estruturas condicionais, como 
 ```elixir
 defmodule ElixGames.Encontro do
   def determina_encontro(localizacao, probabilidade) do
-    # Implemente a lógica de determinação do resultado do encontro aqui
+    hostil = "Criatura hostil"
+    amigavel = "Criatura amigável"
+
+    cond do
+      localizacao == "Bosque Encantado" && probabilidade > 0 && probabilidade <= 90 ->
+        amigavel
+
+      localizacao == "Caverna Escura" && probabilidade > 0 && probabilidade <= 60 ->
+        amigavel
+
+      localizacao == "Torre Misteriosa" && probabilidade > 0 && probabilidade <= 30 ->
+        amigavel
+
+      true ->
+        hostil
+    end
   end
 end
+```
+
+```elixir
+ElixGames.Encontro.determina_encontro("Bosque Encantado", 90)
 ```
 
 ### Exercício 2
