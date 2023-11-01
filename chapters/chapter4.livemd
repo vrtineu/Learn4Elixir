@@ -263,7 +263,35 @@ Vamos criar um sistema simples para rastrear o número de acessos a uma página 
 Escreva sua solução na célula abaixo. Se necessário, crie mais células.
 
 ```elixir
-"Coloque aqui sua solução"
+defmodule Acesso do
+  def inicia do
+    {:ok, agent} = Agent.start(fn -> [] end)
+    IO.puts("Agente iniciado com pid #{inspect(agent)} e state []")
+    agent
+  end
+
+  def registrar_acesso(agent) do
+    IO.puts("Registrando novo acesso")
+
+    Agent.update(agent, fn state ->
+      {:ok, data_hora} = DateTime.now("Etc/UTC")
+      [data_hora | state]
+    end)
+  end
+
+  def obter_acessos(agent) do
+    IO.puts("Obtendo acessos")
+    Agent.get(agent, fn state -> state end)
+  end
+end
+```
+
+```elixir
+agent = Acesso.inicia()
+Acesso.registrar_acesso(agent)
+Acesso.registrar_acesso(agent)
+Acesso.registrar_acesso(agent)
+Acesso.obter_acessos(agent)
 ```
 
 ## Exercício 2
@@ -285,7 +313,40 @@ Considere o caso em que a data de nascimento fornecida está no futuro em relaç
 Este exercício permitirá que você pratique a manipulação de datas em Elixir, incluindo o cálculo de anos bissextos, a diferença entre datas e a formatação dos resultados.
 
 ```elixir
-def calcular_idade(data_aniversario) do
-  # Escreva aqui a sua solução
+defmodule Idade do
+  def calcular_idade({ano, mes, dia}) do
+    {:ok, data_atual} = DateTime.now("Etc/UTC")
+
+    {ano_atual, mes_atual, dia_atual} =
+      {data_atual.year, data_atual.month, data_atual.day}
+
+    cond do
+      {ano, mes, dia} > {ano_atual, mes_atual, dia_atual} ->
+        "A data informada está no futuro"
+
+      {mes, dia} == {mes_atual, dia_atual} ->
+        "Hoje você completa #{ano_atual - ano} anos, parabéns pelo aniversário!"
+
+      {mes, dia} != {mes_atual, dia_atual} ->
+        "#{ano_atual - ano} anos"
+
+      true ->
+        nil
+    end
+  end
 end
+```
+
+```elixir
+Idade.calcular_idade({2001, 5, 7})
+```
+
+```elixir
+{:ok, testa_futuro} = DateTime.now("Etc/UTC")
+Idade.calcular_idade({testa_futuro.year + 1, testa_futuro.month, testa_futuro.day})
+```
+
+```elixir
+{:ok, testa_atual} = DateTime.now("Etc/UTC")
+Idade.calcular_idade({1970, testa_atual.month, testa_atual.day})
 ```
