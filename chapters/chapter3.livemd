@@ -432,37 +432,59 @@ A seguir está um exemplo de como as informações dos clientes estão atualment
 1. Crie uma função chamada `parsear_clientes/1` que receba a string de informações de clientes e a divida em uma lista de informações de clientes formatadas. Use o sigil `~s` para fazer isso.
 
 ```elixir
-def parsear_clientes(informacao) do
-  # A fazer
+defmodule ParseCliente do
+  def parsear_clientes(informacao) do
+    informacao
+    |> String.split(~r/;/)
+    |> Enum.map(&formata_cliente/1)
+  end
+
+  defp formata_cliente(cliente) do
+    [nome, idade, email, fone] = String.split(cliente, ~r/,/)
+
+    %{
+      nome: String.replace(nome, ~r/\"/, ""),
+      idade: String.to_integer(idade),
+      email: email,
+      fone: fone
+    }
+  end
 end
 ```
 
 ```elixir
+informacao =
+  ~s("Fulano Tal",30,fulano@email.com,+5511995236587;"Ciclano Outro",25,ciclano@email.com,5545996578452)
 
+clientes_lista = ParseCliente.parsear_clientes(informacao)
 ```
 
 1. Crie outra função chamada `extrair_nomes/1` que receba a lista de informações de clientes e retorne uma lista com os nomes dos clientes.
 
 ```elixir
-def extrair_nomes(clientes) do
-  # A fazer
+defmodule ParseNome do
+  def extrair_nomes(clientes) do
+    Enum.map(clientes, fn %{nome: nome} -> nome end)
+  end
 end
 ```
 
 ```elixir
-# Caso a entrada fosse o exemplo na descrição deve imprimir ["Fulano Tal", "Ciclano Outro"]
+ParseNome.extrair_nomes(clientes_lista)
 ```
 
 1. Crie uma terceira função chamada `filtrar_clientes_por_idade/2` que receba a lista de informações de clientes e uma idade mínima e retorne uma lista com as informações dos clientes que têm pelo menos a idade especificada.
 
 ```elixir
-def filtrar_clientes_por_idade(clientes, idade_minima) do
-  # A fazer
+defmodule FilterCliente do
+  def filtrar_clientes_por_idade(clientes, idade_minima) do
+    Enum.filter(clientes, fn %{idade: idade} -> idade >= idade_minima end)
+  end
 end
 ```
 
 ```elixir
-# Deveria imprimir [["Fulano Tal", 30, "fulano@email.com", "+5511995236587"]]
+FilterCliente.filtrar_clientes_por_idade(clientes_lista, 30)
 ```
 
 ### Exercicio 3
@@ -496,6 +518,67 @@ calcula_total(produtos, cliente) # deve retornar 247.50
 
 ```elixir
 defmodule Ecommerce do
-  # A fazer
+  def calcula_total(produtos, cliente) do
+    produtos
+    |> soma_valores()
+    |> aplica_desconto()
+    |> aplica_desconto_clube(cliente)
+    |> aplica_cupom(cliente)
+  end
+
+  defp soma_valores(produtos) do
+    produtos
+    |> Enum.map(fn %{preco: preco, quantidade: quantidade} ->
+      preco * quantidade
+    end)
+    |> Enum.sum()
+  end
+
+  defp aplica_desconto_clube(valor, cliente) do
+    if membro_clube?(cliente) do
+      valor - valor * 0.05
+    else
+      valor
+    end
+  end
+
+  defp membro_clube?(%{membro_clube: true}), do: true
+  defp membro_clube?(_), do: false
+
+  defp aplica_cupom(valor, cliente) do
+    if cupom_valido?(cliente) do
+      valor - valor * 0.10
+    else
+      valor
+    end
+  end
+
+  defp cupom_valido?(%{cupom: "UBL10"}), do: true
+  defp cupom_valido?(_), do: false
+
+  defp aplica_desconto(valor) do
+    cond do
+      valor > 1000 -> valor - valor * 0.20
+      valor > 500 -> valor - valor * 0.15
+      valor > 200 -> valor - valor * 0.10
+      true -> valor
+    end
+  end
 end
+```
+
+```elixir
+produtos = [
+  %{nome: "Ração para gatos", preco: 50.00, quantidade: 2},
+  %{nome: "Brinquedo para cachorro", preco: 30.00, quantidade: 1},
+  %{nome: "Aquário", preco: 200.00, quantidade: 1}
+]
+
+cliente = %{
+  membro_clube: true,
+  cupom: "UBL10"
+}
+
+# deve retornar 243.00
+Ecommerce.calcula_total(produtos, cliente)
 ```
